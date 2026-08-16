@@ -1,5 +1,10 @@
+# imports
+
 import os
 import json
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 filename = "water_tracker.json"
 data = {}
@@ -10,7 +15,7 @@ try:
 except(FileNotFoundError, json.JSONDecodeError):
     data = {}
 
-mode = input("enter mode ('add', 'view', 'goal','clear'): ")
+mode = input("enter mode ('add', 'view', 'goal','clear', 'stats', 'chart'): ")
 if mode == "add":
     while True:
         date = input("enter the date Year-Month-Day: ")    
@@ -27,16 +32,22 @@ if mode == "add":
                 print("this is not a valid integer, retry.")
     with open(filename,"w") as file:
         json.dump(data,file,indent=4)
+
+
 elif mode == "view":
     if not data:
         print("there are no entries ")
     else:
         for date, details in data.items():
             print(f"{date} , {details}ml ")
+
+
 elif mode == "clear":
     data = {}
     with open(filename,"w") as file:
         json.dump(data,file,indent=0)
+
+
 elif mode == "goal":
     while True:
         date_check = input("enter todays date: ")
@@ -48,3 +59,20 @@ elif mode == "goal":
             break
         else:
             print("invalid entry, retry. ")
+
+
+elif mode == "stats":
+    volume_array = np.array(list(data.values()))
+    print(f"mean: {np.round(np.mean(volume_array), 2)}")
+    print(f"maximum: {np.max(volume_array)}")
+    print(f"minimum: {np.min(volume_array)}")
+
+    
+elif mode == "chart":
+    dates = list(data.keys())
+    volumes = list(data.values())
+    plt.bar(dates,volumes)
+    plt.xlabel("Date")
+    plt.ylabel("Volume")
+    plt.xticks(rotation=45)
+    plt.show()
